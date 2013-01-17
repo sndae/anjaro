@@ -1,0 +1,4 @@
+de\jopa\jbot\dispatcher\impl\CommandDispatcher.class
+de\jopa\jbot\bootstrap\JBotStarter.class
+de\jopa\jbot\remote\impl\SocketListenerThread.class
+de\jopa\jbot\dispatcher\impl\ObjectSerializeCommandDispatcher.class
