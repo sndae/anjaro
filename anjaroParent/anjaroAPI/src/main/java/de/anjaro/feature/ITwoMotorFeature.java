@@ -4,6 +4,9 @@ import de.anjaro.model.Direction;
 import de.anjaro.model.MotorStatus;
 import de.anjaro.model.Speed;
 
+/**
+ * The Interface ITwoMotorFeature.
+ */
 public interface ITwoMotorFeature extends IFeature {
 	/**
 	 * Start the right and left motors. If motors are already running, the speed / direction changes

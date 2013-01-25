@@ -32,9 +32,18 @@ public interface IFeature {
 	String getDescription();
 
 
+	/**
+	 * Shut down.
+	 */
 	void shutDown();
 
 
+	/**
+	 * Inits the.
+	 *
+	 * @param pController the controller
+	 * @throws Exception the exception
+	 */
 	void init(IAnjaroController pController) throws Exception;
 
 

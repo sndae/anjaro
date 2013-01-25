@@ -15,6 +15,12 @@ import de.anjaro.util.IShutdownListener;
 public interface IAnjaroController {
 
 
+	/**
+	 * Inits the.
+	 *
+	 * @param pConfigService the config service
+	 * @throws Exception the exception
+	 */
 	void init(IConfigService pConfigService) throws Exception;
 
 	/**
@@ -35,6 +41,11 @@ public interface IAnjaroController {
 
 
 
+	/**
+	 * Adds the shutdown listener.
+	 *
+	 * @param pShutdownListener the shutdown listener
+	 */
 	void addShutdownListener(IShutdownListener pShutdownListener);
 
 

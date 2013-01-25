@@ -1,7 +1,21 @@
 package de.anjaro.model;
 
+/**
+ * The Enum Speed.
+ */
 public enum Speed {
 
-	speed0,speed1,speed2,speed3,speed4,speed5,speed6,speed7,speed8,speed9,speed10;
+	/** The speed0. */
+	speed0,/** The speed1. */
+speed1,/** The speed2. */
+speed2,/** The speed3. */
+speed3,/** The speed4. */
+speed4,/** The speed5. */
+speed5,/** The speed6. */
+speed6,/** The speed7. */
+speed7,/** The speed8. */
+speed8,/** The speed9. */
+speed9,/** The speed10. */
+speed10;
 
 }

@@ -1,7 +1,12 @@
 package de.anjaro.model;
 
+/**
+ * The Enum Direction.
+ */
 public enum Direction {
 
 
-	forward, backward;
+	/** The forward. */
+	forward, /** The backward. */
+ backward;
 }

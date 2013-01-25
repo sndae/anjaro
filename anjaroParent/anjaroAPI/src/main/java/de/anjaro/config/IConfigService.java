@@ -5,27 +5,38 @@ import java.util.List;
 import de.anjaro.controller.IAnjaroController;
 import de.anjaro.feature.IFeature;
 import de.anjaro.remote.IAdapter;
-import de.anjaro.util.AnjaroConstants;
 
 
 /**
- * Common config interface. It will be initialized from the JobStarter during start of
- * Anjaro.
- * The config will be loaded based on the parameter {@link AnjaroConstants#ARG_CONFIG_CLASS}
- * If not set, the default Properties config service will be used, which will load the
- * file {@link AnjaroConstants#DEFAULT_CONFIG_NAME}, if no vm argument {@link AnjaroConstants#ARG_CONFIG_NAME} is set.
- * Otherwise, the file name specified in this vm argument will be loaded
+ * Common config interface. To keep it simple, the configuration will be loaded from a class.
+ * For each robot mode, there might be a config class, which "orchestrates" all needed features
+ * and adapters together.
+ * The config will be used to initialize the robot.
  * 
  * @author Joachim Pasquali
  */
 public interface IConfigService {
 
 
-
+	/**
+	 * Gets the feature list.
+	 *
+	 * @return the feature list
+	 */
 	List<IFeature> getFeatureList();
 
+	/**
+	 * Gets the adapter list.
+	 *
+	 * @return the adapter list
+	 */
 	List<IAdapter> getAdapterList();
 
+	/**
+	 * Gets the controller.
+	 *
+	 * @return the controller
+	 */
 	IAnjaroController getController();
 
 }
