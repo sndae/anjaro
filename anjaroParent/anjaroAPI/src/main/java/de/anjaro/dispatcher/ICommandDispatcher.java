@@ -1,10 +1,13 @@
 package de.anjaro.dispatcher;
 
-import de.anjaro.controller.IAnjaroController;
+import de.anjaro.exception.DispatcherException;
+import de.anjaro.model.Command;
+import de.anjaro.model.CommandResult;
 
-public interface ICommandDispatcher {
+public interface ICommandDispatcher<C> {
 
-	byte[] execute(byte[] pCommand);
+	Command getCommand(C pCommand) throws DispatcherException;
 
-	void setController(final IAnjaroController pController);
+	C getCommandResult(CommandResult pCommandResult) throws DispatcherException;
+
 }

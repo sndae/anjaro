@@ -2,6 +2,7 @@ package de.anjaro.config;
 
 import java.util.List;
 
+import de.anjaro.controller.IAnjaroController;
 import de.anjaro.feature.IFeature;
 import de.anjaro.remote.IAdapter;
 import de.anjaro.util.AnjaroConstants;
@@ -24,5 +25,7 @@ public interface IConfigService {
 	List<IFeature> getFeatureList();
 
 	List<IAdapter> getAdapterList();
+
+	IAnjaroController getController();
 
 }

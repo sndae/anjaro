@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.anjaro.config.IConfigService;
+import de.anjaro.controller.IAnjaroController;
+import de.anjaro.controller.impl.DefaultControllerImpl;
+import de.anjaro.dispatcher.impl.ObjectSerializeCommandDispatcher;
 import de.anjaro.feature.IFeature;
 import de.anjaro.feature.impl.RaspberryServoMotorFeature;
 import de.anjaro.remote.IAdapter;
+import de.anjaro.remote.impl.BluetoothInboundAdapter;
 
 public class BTRemoteRobot implements IConfigService {
 
@@ -17,11 +21,26 @@ public class BTRemoteRobot implements IConfigService {
 		return result;
 	}
 
+
+
 	@Override
 	public List<IAdapter> getAdapterList() {
-		// TODO Auto-generated method stub
-		return null;
+		@SuppressWarnings("rawtypes")
+		final List<IAdapter> resultList = new ArrayList<IAdapter>();
+		final BluetoothInboundAdapter btAdapter = new BluetoothInboundAdapter();
+		btAdapter.setCommandDispatcher(new ObjectSerializeCommandDispatcher());
+		resultList.add(btAdapter);
+		return resultList;
 	}
+
+
+
+	@Override
+	public IAnjaroController getController() {
+		return new DefaultControllerImpl();
+	}
+
+
 
 
 

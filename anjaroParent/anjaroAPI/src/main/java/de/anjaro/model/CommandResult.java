@@ -25,20 +25,12 @@ public class CommandResult implements Serializable{
 	public CommandResult() {
 		super();
 	}
-
-
-
-
 	/**
 	 * @return error code. 0 if no error
 	 */
 	public int getErrorCode() {
 		return this.errorCode;
 	}
-
-
-
-
 	/**
 	 * @param pErrorCode sets the erro code.
 	 * @See
@@ -46,10 +38,6 @@ public class CommandResult implements Serializable{
 	public void setErrorCode(final int pErrorCode) {
 		this.errorCode = pErrorCode;
 	}
-
-
-
-
 
 	/**
 	 * Gets the success result.
@@ -59,11 +47,6 @@ public class CommandResult implements Serializable{
 	public Object getSuccessResult() {
 		return this.successResult;
 	}
-
-
-
-
-
 
 
 	public String getErrorMessage() {
@@ -97,6 +80,13 @@ public class CommandResult implements Serializable{
 	public void setErrorTime(final Date pErrorTime) {
 		this.errorTime = pErrorTime;
 	}
+	@Override
+	public String toString() {
+		return "CommandResult [" + (this.errorMessage != null ? "errorMessage=" + this.errorMessage + ", " : "") + "errorCode=" + this.errorCode + ", " + (this.errorTime != null ? "errorTime=" + this.errorTime + ", " : "")
+				+ (this.successResult != null ? "successResult=" + this.successResult : "") + "]";
+	}
+
+
 
 
 

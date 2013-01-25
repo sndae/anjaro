@@ -3,11 +3,15 @@ package de.anjaro.remote;
 import de.anjaro.controller.IAnjaroController;
 import de.anjaro.dispatcher.ICommandDispatcher;
 
-public interface IAdapter extends Runnable {
+public interface IAdapter<C> extends Runnable {
 
-	void init(IAnjaroController pController);
+	String getName();
+
+	void init(IAnjaroController pController) throws Exception;
 
 
-	void setCommandDispatcher(ICommandDispatcher pCommandDispatcher);
+	void setCommandDispatcher(ICommandDispatcher<C> pCommandDispatcher);
+
+	void shutDown();
 
 }

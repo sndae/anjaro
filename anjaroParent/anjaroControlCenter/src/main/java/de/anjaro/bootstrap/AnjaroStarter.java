@@ -2,102 +2,75 @@ package de.anjaro.bootstrap;
 
 import java.util.logging.Logger;
 
+import de.anjaro.config.IConfigService;
 import de.anjaro.controller.IAnjaroController;
-import de.anjaro.dispatcher.ICommandDispatcher;
+import de.anjaro.util.AnjaroConstants;
+import de.anjaro.util.IShutdownListener;
 
 /**
  * The Class AnjaroStarter. This is the central starting class for the anjaro
  * system.
  */
-public class AnjaroStarter {
+public class AnjaroStarter implements IShutdownListener {
 
 	/** The Constant LOG. */
 	private static final Logger LOG = Logger.getLogger(AnjaroStarter.class.getName());
 
 	/** The already cleanedup. */
-	private static boolean alreadyCleanedup = false;
+	private boolean alreadyCleanedup = false;
 
 	/** The controller. */
-	private static IAnjaroController controller;
+	private IAnjaroController controller;
 
-	/** The dispatcher. */
-	private static ICommandDispatcher commandDispatcher;
+	private boolean shutDown = false;
 
-	/**
-	 * The main method.
-	 * <p>
-	 * First, the configuration will be initialized. To do so, the
-	 * {@link ARG_CONFIG_CLASS} VM parameter will be checked. If null, the
-	 * standard {@link PropertiesConfig} will be initialized. Out of this
-	 * config, the controller, command dispatcher and the connector will be read
-	 * and initialized.
-	 * </p>
-	 * <p>
-	 * Furthermore, a stoplistener will be created.
-	 * </p>
-	 * 
-	 * @param args
-	 *            the arguments
-	 */
+
 	public static void main(final String[] args) {
-		//		LOG.entering("de.anjaro.bootstrap.AnjaroStarter", "main");
-		//		final String configClass = System.getProperty(ARG_CONFIG_CLASS);
-		//		IConfigService configService = null;
-		//		if (configClass != null) {
-		//			try {
-		//				configService = (IConfigService) Class.forName(configClass).newInstance();
-		//			} catch (final Exception e) {
-		//				LOG.severe("Unable to initialize config class: " + configClass);
-		//				LOG.throwing(AnjaroStarter.class.getName(), "Main", e);
-		//				System.exit(-1);
-		//			}
-		//		} else {
-		//			try {
-		//				configService = new PropertiesConfig();
-		//			} catch (final Exception e) {
-		//				LOG.severe("Unable to initialize PropertiesConfig.");
-		//				LOG.throwing(AnjaroStarter.class.getName(), "Main", e);
-		//				System.exit(-1);
-		//			}
-		//		}
-		//
-		//		// TODO: setup shutdown hook (socket listener or similar
-		//		try {
-		//
-		//			controller = configService.getController();
-		//			controller.init(configService);
-		//			LOG.finer("-- Controller initialized: " + controller.getClass().getName());
-		//
-		//			commandDispatcher = configService.getcomCommandDispatcher();
-		//			commandDispatcher.setController(controller);
-		//			LOG.finer("Commadn dispatcher initialized: " + commandDispatcher.getClass().getName());
-		//
-		//			remoteConnector = configService.getRemoteConnector();
-		//			remoteConnector.setCommandDispatcher(commandDispatcher);
-		//			LOG.finer("Remote connector initialized: " + remoteConnector.getClass().getName());
-		//
-		//			final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		//			String line = "";
-		//			while (!line.equals("exit")) {
-		//				line = reader.readLine();
-		//				if (line.equals("rf")) {
-		//					System.out.println("running the right motor");
-		//					controller.runRightMotor(Direction.forward, Speed.speed10);
-		//				} else if (line.equals("lf")) {
-		//					System.out.println("running the left motor");
-		//					controller.runLeftMotor(Direction.forward, Speed.speed10);
-		//				}
-		//			}
-		//		} catch (final Throwable e) {
-		//			LOG.severe("Unexpected error occurred: " + e.getMessage());
-		//			LOG.throwing(AnjaroStarter.class.getName(), "main", e);
-		//			System.exit(-1);
-		//		} finally {
-		//			remoteConnector.shutDown();
-		//			controller.shutdown();
-		//			alreadyCleanedup = true;
-		//		}
+		final AnjaroStarter starter = new AnjaroStarter();
+		starter.startAnjaro();
 
+	}
+
+	public void startAnjaro() {
+		LOG.entering("de.anjaro.bootstrap.AnjaroStarter", "main");
+		final String configClass = System.getProperty(AnjaroConstants.ARG_CONFIG_CLASS);
+		if (configClass == null) {
+			throw new IllegalArgumentException(AnjaroConstants.ARG_CONFIG_CLASS + " must be set");
+		}
+		try {
+			LOG.fine("Read config from java vm properties");
+			final IConfigService config = (IConfigService) Class.forName(configClass).newInstance();
+			LOG.fine("Get controller from config");
+			this.controller = config.getController();
+
+			if (this.controller == null) {
+				throw new IllegalArgumentException("Controller must not be null. Please check your ConfigService class");
+			}
+			LOG.fine("Initialize controller");
+			this.controller.init(config);
+			this.controller.addShutdownListener(this);
+			LOG.fine("##########  Anjaro is running now ...");
+			this.waitForShutdown();
+			LOG.fine("Shutdown now");
+			this.controller.shutdown();
+			this.alreadyCleanedup = true;
+			LOG.fine("Shutdown complete. Bye!");
+		} catch (final InstantiationException e) {
+			LOG.throwing(AnjaroStarter.class.getName(), "main", e);
+			throw new IllegalArgumentException("Unable to initialize " + configClass, e);
+		} catch (final IllegalAccessException e) {
+			LOG.throwing(AnjaroStarter.class.getName(), "main", e);
+			throw new IllegalArgumentException("I do not have access to " + configClass, e);
+		} catch (final ClassNotFoundException e) {
+			LOG.throwing(AnjaroStarter.class.getName(), "main", e);
+			throw new IllegalArgumentException("Cannot find class " + configClass + ". Please check parameter " + AnjaroConstants.ARG_CONFIG_CLASS, e);
+		} catch (final ClassCastException e) {
+			LOG.throwing(AnjaroStarter.class.getName(), "main", e);
+			throw new IllegalArgumentException(configClass + " is no instance of " + IConfigService.class.getName(), e);
+		} catch (final Exception e) {
+			LOG.throwing(AnjaroStarter.class.getName(), "main", e);
+			throw new IllegalArgumentException("Unexpected initialization error while initializing Anjaro", e);
+		}
 	}
 
 	/**
@@ -105,10 +78,27 @@ public class AnjaroStarter {
 	 */
 	@Override
 	protected void finalize() throws Throwable {
-		if (!alreadyCleanedup) {
-			//			remoteConnector.shutDown();
-			controller.shutdown();
+		if (!this.alreadyCleanedup) {
+			this.controller.shutdown();
 		}
 	}
+
+	private synchronized void waitForShutdown() {
+		try {
+			while (!this.shutDown) {
+				Thread.sleep(500);
+			}
+		} catch (final InterruptedException e) {
+			LOG.throwing(this.getClass().getName(), "waitForShutdown", e);
+			System.exit(-1);
+		}
+	}
+
+	@Override
+	public void shutDown() {
+		this.shutDown = true;
+
+	}
+
 
 }

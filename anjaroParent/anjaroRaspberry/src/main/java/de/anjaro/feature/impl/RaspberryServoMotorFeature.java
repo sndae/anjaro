@@ -251,7 +251,8 @@ public class RaspberryServoMotorFeature implements ITwoMotorFeature {
 	 */
 	@Override
 	public void shutDown() {
-		LOG.entering(RaspberryServoMotorFeature.class.getName(), "onShutDown");
+		LOG.entering(RaspberryServoMotorFeature.class.getName(), "shutDown");
+		this.stopAllMotors();
 		try {
 			this.write(UNEXPORT, this.rightMotorPin.getPinName(this.revision));
 			this.write(UNEXPORT, this.leftMotorPin.getPinName(this.revision));
@@ -300,7 +301,7 @@ public class RaspberryServoMotorFeature implements ITwoMotorFeature {
 	private OutputStream getOutputStream(final String pPath) throws IOException {
 		LOG.entering(RaspberryServoMotorFeature.class.getName(), "getOutputStream");
 		OutputStream out;
-		if (System.getProperty(ARG_TEST_MODE) != null && ARG_TEST_MODE.equalsIgnoreCase("true")) {
+		if (System.getProperty(ARG_TEST_MODE) != null && System.getProperty(ARG_TEST_MODE).equalsIgnoreCase("true")) {
 			out = new ByteArrayOutputStream();
 		} else {
 			out = new FileOutputStream(pPath);

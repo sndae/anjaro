@@ -21,5 +21,11 @@
 			<artifactId>anjaroAPI</artifactId>
 			<version>${anjaro.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>de.anjaro</groupId>
+			<artifactId>anjaroControlCenter</artifactId>
+			<version>${anjaro.version}</version>
+		</dependency>
 	</dependencies>
 </project>

@@ -6,7 +6,7 @@ public class Command implements Serializable {
 
 
 	private static final long serialVersionUID = 567595956434734947L;
-	private String feature;
+	private String featureName;
 	private String method;
 	private Serializable[] params;
 
@@ -21,17 +21,18 @@ public class Command implements Serializable {
 		return this.params;
 	}
 
-	public void setParams(final Serializable[]... pParams) {
+	public void setParams(final Serializable... pParams) {
 		this.params = pParams;
 	}
 
-	public String getFeature() {
-		return this.feature;
+	public String getFeatureName() {
+		return this.featureName;
+	}
+	public void setFeatureName(final String pFeatureName) {
+		this.featureName = pFeatureName;
 	}
 
-	public void setFeature(final String pFeature) {
-		this.feature = pFeature;
-	}
+
 
 
 

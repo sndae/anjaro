@@ -2,6 +2,7 @@ package de.anjaro.controller;
 import de.anjaro.config.IConfigService;
 import de.anjaro.model.Command;
 import de.anjaro.model.CommandResult;
+import de.anjaro.util.IShutdownListener;
 
 /**
  * The controller handles all the lifecycle.
@@ -14,7 +15,7 @@ import de.anjaro.model.CommandResult;
 public interface IAnjaroController {
 
 
-	void init(IAnjaroController pController);
+	void init(IConfigService pConfigService) throws Exception;
 
 	/**
 	 * Has to be called before stopping the system.
@@ -34,7 +35,7 @@ public interface IAnjaroController {
 
 
 
-
+	void addShutdownListener(IShutdownListener pShutdownListener);
 
 
 }
