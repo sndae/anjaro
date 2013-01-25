@@ -5,7 +5,9 @@ import de.anjaro.model.MotorStatus;
 import de.anjaro.model.Speed;
 
 /**
- * The Interface ITwoMotorFeature.
+ * The Interface ITwoMotorFeature for handling 2 motors.
+ * 
+ * @author Joachim Pasquali
  */
 public interface ITwoMotorFeature extends IFeature {
 	/**

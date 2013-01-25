@@ -6,8 +6,9 @@ import de.anjaro.util.IShutdownListener;
 
 /**
  * The controller handles all the lifecycle.
- * Once initialized with {@link IConfigService}, all features will be loaded
+ * Once initialized with {@link IConfigService}, all features and adapters should be loaded
  * and initialized.
+ * During the shutdown phase, all features and adapters should be shutdown.
  * 
  * 
  * @author Joachim Pasquali
@@ -16,7 +17,7 @@ public interface IAnjaroController {
 
 
 	/**
-	 * Inits the.
+	 * Inits the controller.
 	 *
 	 * @param pConfigService the config service
 	 * @throws Exception the exception
@@ -42,7 +43,8 @@ public interface IAnjaroController {
 
 
 	/**
-	 * Adds the shutdown listener.
+	 * Adds the shutdown listener. If there is some class to be informed, when the system shuts down,
+	 * it can register a shutdown listener over this method.
 	 *
 	 * @param pShutdownListener the shutdown listener
 	 */

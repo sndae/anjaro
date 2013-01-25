@@ -4,19 +4,21 @@ import java.io.Serializable;
 
 /**
  * The Class Command.
+ * 
+ * @author Joachim Pasquali
  */
 public class Command implements Serializable {
 
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 567595956434734947L;
-	
+
 	/** The feature name. */
 	private String featureName;
-	
+
 	/** The method. */
 	private String method;
-	
+
 	/** The params. */
 	private Serializable[] params;
 
@@ -28,7 +30,7 @@ public class Command implements Serializable {
 	public String getMethod() {
 		return this.method;
 	}
-	
+
 	/**
 	 * Sets the method.
 	 *
@@ -64,7 +66,7 @@ public class Command implements Serializable {
 	public String getFeatureName() {
 		return this.featureName;
 	}
-	
+
 	/**
 	 * Sets the feature name.
 	 *

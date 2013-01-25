@@ -8,7 +8,7 @@ import de.anjaro.controller.IAnjaroController;
  * Features can be defined in the configuration and will than be
  * started by the system during startup.
  * This enables the developer, to run the robot in an autonomous mode.
- * A feature normally starts several sensors and handles the movement and
+ * A feature normally starts several sensors and actors. It steers the
  * behavior of the robot by analysing the sensor results and sending commands
  * to the controller.
  * 
@@ -39,7 +39,7 @@ public interface IFeature {
 
 
 	/**
-	 * Inits the.
+	 * Inits the feature.
 	 *
 	 * @param pController the controller
 	 * @throws Exception the exception

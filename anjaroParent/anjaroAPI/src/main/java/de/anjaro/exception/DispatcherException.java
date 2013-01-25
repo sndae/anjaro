@@ -5,6 +5,8 @@ import de.anjaro.util.IAnjaroError;
 
 /**
  * The Class DispatcherException.
+ * 
+ * @author Joachim Pasquali
  */
 public class DispatcherException extends AnjaroException {
 

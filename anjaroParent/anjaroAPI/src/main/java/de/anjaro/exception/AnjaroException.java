@@ -4,6 +4,8 @@ import de.anjaro.util.IAnjaroError;
 
 /**
  * The Class AnjaroException.
+ * 
+ * @author Joachim Pasquali
  */
 public class AnjaroException extends Exception {
 
