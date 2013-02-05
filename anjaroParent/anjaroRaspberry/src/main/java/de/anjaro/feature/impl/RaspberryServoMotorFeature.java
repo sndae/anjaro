@@ -6,7 +6,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -102,8 +101,8 @@ public class RaspberryServoMotorFeature implements ITwoMotorFeature {
 		if (this.revision == null) {
 			throw new IllegalArgumentException("Revision must not be null. Please check " + RASPBERRY_CONFIG);
 		}
-		for (final Iterator<Object> it = this.config.keySet().iterator(); it.hasNext(); ) {
-			final String key = (String) it.next();
+		for (final Object object : this.config.keySet()) {
+			final String key = (String) object;
 			System.setProperty(key, this.config.getProperty(key));
 		}
 		this.initializePin(this.rightMotorPin);
@@ -118,7 +117,7 @@ public class RaspberryServoMotorFeature implements ITwoMotorFeature {
 	 */
 	@Override
 	public String getName() {
-		return "Java local servo motor service.";
+		return "twoMotorFeature";
 	}
 
 	/* (non-Javadoc)
@@ -272,7 +271,12 @@ public class RaspberryServoMotorFeature implements ITwoMotorFeature {
 	 */
 	private void initializePin(final GpioPin pPin) throws IOException {
 		LOG.entering(RaspberryServoMotorFeature.class.getName(), "initializePin");
-		this.write(EXPORT, pPin.getPinName(this.revision));
+		try {
+			this.write(EXPORT, pPin.getPinName(this.revision));
+		} catch (final Exception e) {
+			this.write(UNEXPORT, pPin.getPinName(this.revision));
+			this.write(EXPORT, pPin.getPinName(this.revision));
+		}
 		this.write(String.format(DIRECTION, pPin.getPinName(this.revision)), "out");
 	}
 

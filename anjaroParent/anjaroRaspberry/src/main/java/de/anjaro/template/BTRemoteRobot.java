@@ -24,8 +24,8 @@ public class BTRemoteRobot implements IConfigService {
 
 
 	@Override
+	@SuppressWarnings("rawtypes")
 	public List<IAdapter> getAdapterList() {
-		@SuppressWarnings("rawtypes")
 		final List<IAdapter> resultList = new ArrayList<IAdapter>();
 		final BluetoothInboundAdapter btAdapter = new BluetoothInboundAdapter();
 		btAdapter.setCommandDispatcher(new ObjectSerializeCommandDispatcher());

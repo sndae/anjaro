@@ -117,7 +117,7 @@ public class DefaultControllerImpl implements IAnjaroController {
 					}
 					method = feature.getClass().getMethod(pCommand.getMethod(), clazzArray);
 				} else {
-					method = feature.getClass().getMethod(pCommand.getMethod(), (Class<?>) null);
+					method = feature.getClass().getMethod(pCommand.getMethod(), null);
 				}
 
 				final Serializable objResult = (Serializable) method.invoke(feature, (Object[]) pCommand.getParams());

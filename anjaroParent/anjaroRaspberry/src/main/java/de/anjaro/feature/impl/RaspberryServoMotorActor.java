@@ -138,6 +138,7 @@ public class RaspberryServoMotorActor implements IActor {
 	@Override
 	public void run() {
 		LOG.entering(RaspberryServoMotorActor.class.getName(), "run");
+		Thread.currentThread().setName("ServoMotorThreadForPin" + this.pin.name());
 		synchronized (this) {
 			this.status.setActive(true);
 

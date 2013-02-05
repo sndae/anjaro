@@ -1,6 +1,7 @@
 package de.anjaro.model;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * The Class Command.
@@ -74,6 +75,12 @@ public class Command implements Serializable {
 	 */
 	public void setFeatureName(final String pFeatureName) {
 		this.featureName = pFeatureName;
+	}
+
+	@Override
+	public String toString() {
+		return "Command [" + (this.featureName != null ? "featureName=" + this.featureName + ", " : "") + (this.method != null ? "method=" + this.method + ", " : "")
+				+ (this.params != null ? "params=" + Arrays.toString(this.params) : "") + "]";
 	}
 
 
