@@ -1,18 +1,14 @@
 package de.anjaro.feature.impl;
 
-import static de.anjaro.util.AnjaroConstants.ARG_TEST_MODE;
-
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.logging.Logger;
 
 import de.anjaro.controller.IAnjaroController;
 import de.anjaro.feature.module.IActor;
+import de.anjaro.gpio.GpioFileWriter;
 import de.anjaro.gpio.GpioPin;
-import de.anjaro.gpio.Revision;
 import de.anjaro.model.Direction;
 import de.anjaro.model.MotorStatus;
 import de.anjaro.model.Speed;
@@ -42,8 +38,6 @@ public class RaspberryServoMotorActor implements IActor {
 	/** The Constant LOOP_HIGH_PROP. => anjaro.raspberry.servo.high.loop.value*/
 	private static final String LOOP_HIGH_PROP = "anjaro.raspberry.servo.high.loop.value";
 
-	/** The Constant VALUE. */
-	private static final String VALUE = "/sys/class/gpio/gpio%s/value";
 
 	/** The status. */
 	private final MotorStatus status = new MotorStatus();
@@ -54,11 +48,6 @@ public class RaspberryServoMotorActor implements IActor {
 	/** The pin. */
 	private final GpioPin pin;
 
-	/** The revision. */
-	private final Revision revision;
-
-	/** The test. */
-	private boolean test = false;
 
 	/** The forward. */
 	private final int forward;
@@ -84,13 +73,11 @@ public class RaspberryServoMotorActor implements IActor {
 	 * @param pRevision the revision Revision of the raspberry pi board as described in {@link RaspberryServoMotorFeature}
 	 * @param pChangeDirection true, if the motor should run in the opposite direction than normal
 	 */
-	public RaspberryServoMotorActor(final Direction pDirection, final GpioPin pPin, final Revision pRevision, final boolean pChangeDirection) {
+	public RaspberryServoMotorActor(final Direction pDirection, final GpioPin pPin, final boolean pChangeDirection) {
 		LOG.entering(RaspberryServoMotorActor.class.getName(), "RaspberryServoMotorActor");
 		this.status.setDirection(pDirection);
 		this.status.setSpeed(Speed.speed0);
-		this.revision = pRevision;
 		this.pin = pPin;
-		this.test = System.getProperty(ARG_TEST_MODE) != null && System.getProperty(ARG_TEST_MODE).equalsIgnoreCase("true");
 		int lowValue = 0;
 		try {
 			lowValue = Integer.parseInt(System.getProperty(LOOP_LOW_PROP, "0"));
@@ -114,23 +101,6 @@ public class RaspberryServoMotorActor implements IActor {
 
 	}
 
-	/**
-	 * Gets the output stream. In test mode, just returns a @link {@link ByteArrayOutputStream} to mock the motors
-	 *
-	 * @param pPath the path
-	 * @return the output stream
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	private OutputStream getOutputStream(final String pPath) throws IOException {
-		LOG.entering(RaspberryServoMotorActor.class.getName(), "getOutputStream");
-		OutputStream out;
-		if (this.test) {
-			out = new ByteArrayOutputStream();
-		} else {
-			out = new FileOutputStream(pPath);
-		}
-		return out;
-	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Runnable#run()
@@ -149,8 +119,7 @@ public class RaspberryServoMotorActor implements IActor {
 			this.status.setSpeed(Speed.speed10);
 			OutputStream out = null;
 			try {
-				final String formattedOut = String.format(VALUE, this.pin.getPinName(this.revision));
-				out = this.getOutputStream(formattedOut);
+				out = GpioFileWriter.getOutputStream(this.pin);
 				while (this.running) {
 					out.write("1".getBytes());
 					for (int i = 0; i < counter; i++) {

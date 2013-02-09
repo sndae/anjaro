@@ -1,12 +1,6 @@
 package de.anjaro.feature.impl;
 
-import static de.anjaro.util.AnjaroConstants.ARG_TEST_MODE;
-
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -14,8 +8,8 @@ import java.util.logging.Logger;
 
 import de.anjaro.controller.IAnjaroController;
 import de.anjaro.feature.ITwoMotorFeature;
+import de.anjaro.gpio.GpioFileWriter;
 import de.anjaro.gpio.GpioPin;
-import de.anjaro.gpio.Revision;
 import de.anjaro.model.Direction;
 import de.anjaro.model.MotorStatus;
 import de.anjaro.model.Speed;
@@ -51,24 +45,6 @@ public class RaspberryServoMotorFeature implements ITwoMotorFeature {
 	/** The Constant LOG. */
 	private static final Logger LOG = Logger.getLogger(RaspberryServoMotorFeature.class.getName());
 
-	/** The Constant REVISION_PROP_NAME. => anjaro.raspberry.revision*/
-	private static final String REVISION_PROP_NAME = "anjaro.raspberry.revision";
-
-	private static final String RASPBERRY_CONFIG = "raspberry-config.properties";
-
-	/** The Constant EXPORT. */
-	private static final String EXPORT = "/sys/class/gpio/export";
-
-	/** The Constant UNEXPORT. */
-	private static final String UNEXPORT = "/sys/class/gpio/unexport";
-
-	/** The Constant DIRECTION. */
-	private static final String DIRECTION = "/sys/class/gpio/gpio%S/direction";
-
-
-	/** The revision. */
-	private Revision revision;
-
 	/** The right motor pin. */
 	private final GpioPin rightMotorPin = GpioPin.p16;
 
@@ -87,26 +63,12 @@ public class RaspberryServoMotorFeature implements ITwoMotorFeature {
 	/** The left executor service. */
 	private final ExecutorService leftExecutorService = Executors.newSingleThreadExecutor();
 
-	/** The config. */
-	private Properties config;
-
 
 	@Override
 	public void init(final IAnjaroController pController) throws Exception {
 		LOG.entering(RaspberryServoMotorFeature.class.getName(), "init");
-		this.config = new Properties();
-		// TODO to make secure: can we evaluate revision label using runtime execute?
-		this.config.load(this.getClass().getClassLoader().getResourceAsStream(RASPBERRY_CONFIG));
-		this.revision = Revision.valueOf(this.config.getProperty(REVISION_PROP_NAME));
-		if (this.revision == null) {
-			throw new IllegalArgumentException("Revision must not be null. Please check " + RASPBERRY_CONFIG);
-		}
-		for (final Object object : this.config.keySet()) {
-			final String key = (String) object;
-			System.setProperty(key, this.config.getProperty(key));
-		}
-		this.initializePin(this.rightMotorPin);
-		this.initializePin(this.leftMotorPin);
+		GpioFileWriter.initializePin(this.rightMotorPin);
+		GpioFileWriter.initializePin(this.leftMotorPin);
 		LOG.exiting(RaspberryServoMotorFeature.class.getName(), "init");
 	}
 
@@ -145,7 +107,7 @@ public class RaspberryServoMotorFeature implements ITwoMotorFeature {
 	public void runRightMotor(final Direction pDirection, final Speed pSpeed) {
 		LOG.entering(RaspberryServoMotorFeature.class.getName(), "runRightMotor");
 		this.stopMotor(this.rightMotor, this.rightExecutorService);
-		this.rightMotor = new RaspberryServoMotorActor(pDirection, this.rightMotorPin, this.revision, false);
+		this.rightMotor = new RaspberryServoMotorActor(pDirection, this.rightMotorPin, false);
 		this.rightExecutorService.execute(this.rightMotor);
 	}
 
@@ -156,7 +118,7 @@ public class RaspberryServoMotorFeature implements ITwoMotorFeature {
 	public void runLeftMotor(final Direction pDirection, final Speed pSpeed) {
 		LOG.entering(RaspberryServoMotorFeature.class.getName(), "runLeftMotor");
 		this.stopMotor(this.leftMotor, this.leftExecutorService);
-		this.leftMotor = new RaspberryServoMotorActor(pDirection, this.leftMotorPin, this.revision, true);
+		this.leftMotor = new RaspberryServoMotorActor(pDirection, this.leftMotorPin, true);
 		this.leftExecutorService.execute(this.leftMotor);
 	}
 
@@ -253,8 +215,8 @@ public class RaspberryServoMotorFeature implements ITwoMotorFeature {
 		LOG.entering(RaspberryServoMotorFeature.class.getName(), "shutDown");
 		this.stopAllMotors();
 		try {
-			this.write(UNEXPORT, this.rightMotorPin.getPinName(this.revision));
-			this.write(UNEXPORT, this.leftMotorPin.getPinName(this.revision));
+			GpioFileWriter.releasePin(this.rightMotorPin);
+			GpioFileWriter.releasePin(this.leftMotorPin);
 		} catch (final IOException e) {
 			LOG.severe("Unable to shut down GPIO pins.");
 			LOG.throwing(this.getClass().getName(), "onShutDown", e);
@@ -263,53 +225,6 @@ public class RaspberryServoMotorFeature implements ITwoMotorFeature {
 
 
 
-	/**
-	 * Initialize pin.
-	 *
-	 * @param pPin the pin
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	private void initializePin(final GpioPin pPin) throws IOException {
-		LOG.entering(RaspberryServoMotorFeature.class.getName(), "initializePin");
-		try {
-			this.write(EXPORT, pPin.getPinName(this.revision));
-		} catch (final Exception e) {
-			this.write(UNEXPORT, pPin.getPinName(this.revision));
-			this.write(EXPORT, pPin.getPinName(this.revision));
-		}
-		this.write(String.format(DIRECTION, pPin.getPinName(this.revision)), "out");
-	}
 
-	/**
-	 * Write.
-	 *
-	 * @param pFilePath the file path
-	 * @param pValue the value
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	private void write(final String pFilePath, final String pValue) throws IOException {
-		LOG.entering(RaspberryServoMotorFeature.class.getName(), "write");
-		final OutputStream out = this.getOutputStream(pFilePath);
-		out.write(pValue.getBytes());
-		out.flush();
-		out.close();
-	}
 
-	/**
-	 * For testing purposes. This is not nice, but I found no nicer way so far...
-	 *
-	 * @param pPath the path
-	 * @return the output stream
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	private OutputStream getOutputStream(final String pPath) throws IOException {
-		LOG.entering(RaspberryServoMotorFeature.class.getName(), "getOutputStream");
-		OutputStream out;
-		if (System.getProperty(ARG_TEST_MODE) != null && System.getProperty(ARG_TEST_MODE).equalsIgnoreCase("true")) {
-			out = new ByteArrayOutputStream();
-		} else {
-			out = new FileOutputStream(pPath);
-		}
-		return out;
-	}
 }

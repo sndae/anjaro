@@ -8,6 +8,7 @@ import de.anjaro.controller.IAnjaroController;
 import de.anjaro.controller.impl.DefaultControllerImpl;
 import de.anjaro.dispatcher.impl.ObjectSerializeCommandDispatcher;
 import de.anjaro.feature.IFeature;
+import de.anjaro.feature.impl.RaspberryLedLightFeature;
 import de.anjaro.feature.impl.RaspberryServoMotorFeature;
 import de.anjaro.remote.IAdapter;
 import de.anjaro.remote.impl.BluetoothInboundAdapter;
@@ -18,6 +19,7 @@ public class BTRemoteRobot implements IConfigService {
 	public List<IFeature> getFeatureList() {
 		final List<IFeature> result = new ArrayList<IFeature>();
 		result.add(new RaspberryServoMotorFeature());
+		result.add(new RaspberryLedLightFeature());
 		return result;
 	}
 
