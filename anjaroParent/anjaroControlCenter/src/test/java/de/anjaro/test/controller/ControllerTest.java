@@ -16,7 +16,7 @@ import de.anjaro.controller.impl.DefaultControllerImpl;
 import de.anjaro.feature.IFeature;
 import de.anjaro.model.Command;
 import de.anjaro.model.CommandResult;
-import de.anjaro.remote.IAdapter;
+import de.anjaro.remote.IInboundAdapter;
 import de.anjaro.util.DefaultAnjaroError;
 import de.anjaro.util.IShutdownListener;
 
@@ -26,7 +26,7 @@ public class ControllerTest implements IShutdownListener {
 
 	private boolean shutdown = false;
 	private TestFeature feature;
-	private IAdapter<String> adapter;
+	private IInboundAdapter<String> adapter;
 
 	@Test
 	public void testControllerInitExecute() {
@@ -77,15 +77,15 @@ public class ControllerTest implements IShutdownListener {
 		final List<IFeature> featureList = new ArrayList<IFeature>();
 		featureList.add(this.feature);
 
-		this.adapter = Mockito.mock(IAdapter.class);
-		final List<IAdapter> adapterList = new ArrayList<IAdapter>();
+		this.adapter = Mockito.mock(IInboundAdapter.class);
+		final List<IInboundAdapter> adapterList = new ArrayList<IInboundAdapter>();
 		adapterList.add(this.adapter);
 
 
 
 		final TestConfiguration config = Mockito.mock(TestConfiguration.class);
 		Mockito.when(config.getFeatureList()).thenReturn(featureList);
-		Mockito.when(config.getAdapterList()).thenReturn(adapterList);
+		Mockito.when(config.getInboundAdapterList()).thenReturn(adapterList);
 		Mockito.when(config.getController()).thenReturn((new DefaultControllerImpl()));
 		return config;
 	}

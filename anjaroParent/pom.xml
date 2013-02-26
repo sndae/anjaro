@@ -10,12 +10,6 @@
 		<anjaro.version>0.0.1-SNAPSHOT</anjaro.version>
 	</properties>
 
-	<modules>
-		<module>anjaroAPI</module>
-		<module>anjaroControlCenter</module>
-		<module>anjaroRaspberry</module>
-	</modules>
-
 	<build>
 
 		<plugins>
@@ -54,4 +48,9 @@
 
 		</dependencies>
 	</dependencyManagement>
+	<modules>
+		<module>anjaroAPI</module>
+		<module>anjaroControlCenter</module>
+		<module>anjaroRaspberry</module>
+	</modules>
 </project>

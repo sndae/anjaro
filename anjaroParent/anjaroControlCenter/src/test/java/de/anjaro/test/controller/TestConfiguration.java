@@ -7,7 +7,8 @@ import de.anjaro.config.IConfigService;
 import de.anjaro.controller.IAnjaroController;
 import de.anjaro.controller.impl.DefaultControllerImpl;
 import de.anjaro.feature.IFeature;
-import de.anjaro.remote.IAdapter;
+import de.anjaro.remote.IInboundAdapter;
+import de.anjaro.remote.IOutboundAdapter;
 
 public class TestConfiguration implements IConfigService {
 
@@ -19,7 +20,7 @@ public class TestConfiguration implements IConfigService {
 	}
 
 	@Override
-	public List<IAdapter> getAdapterList() {
+	public List<IInboundAdapter> getInboundAdapterList() {
 		return null;
 	}
 
@@ -27,5 +28,12 @@ public class TestConfiguration implements IConfigService {
 	public IAnjaroController getController() {
 		return new DefaultControllerImpl();
 	}
+
+	@Override
+	public IOutboundAdapter getOutboundAdapter() {
+		return null;
+	}
+
+
 
 }

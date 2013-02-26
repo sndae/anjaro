@@ -18,6 +18,7 @@ import de.anjaro.feature.IFeature;
 import de.anjaro.model.Command;
 import de.anjaro.model.CommandResult;
 import de.anjaro.remote.IAdapter;
+import de.anjaro.remote.IInboundAdapter;
 import de.anjaro.util.CommandResultHelper;
 import de.anjaro.util.DefaultAnjaroError;
 import de.anjaro.util.IShutdownListener;
@@ -46,10 +47,10 @@ public class DefaultControllerImpl implements IAnjaroController {
 			this.featureMap.put(feature.getName(), feature);
 		}
 		LOG.fine("Init adapters");
-		final List<IAdapter> adapterList = this.configService.getAdapterList();
-		if (adapterList != null && adapterList.size() > 0) {
+		final List<IInboundAdapter> adapterList = this.configService.getInboundAdapterList();
+		if ((adapterList != null) && (adapterList.size() > 0)) {
 			this.executorService = Executors.newFixedThreadPool(adapterList.size());
-			for (final IAdapter<? extends Object> adapter : adapterList) {
+			for (final IInboundAdapter<? extends Object> adapter : adapterList) {
 				LOG.fine("Initialize " + adapter.getName());
 				adapter.init(this);
 				this.executorService.execute(adapter);
@@ -62,8 +63,8 @@ public class DefaultControllerImpl implements IAnjaroController {
 	public void shutdown() {
 		LOG.entering(DefaultControllerImpl.class.getName(), "shutdown");
 		LOG.fine("Shutdown adapters");
-		if (this.configService.getAdapterList() != null && !this.configService.getAdapterList().isEmpty()) {
-			for (final IAdapter<? extends Object> adapter : this.configService.getAdapterList()) {
+		if ((this.configService.getInboundAdapterList() != null) && !this.configService.getInboundAdapterList().isEmpty()) {
+			for (final IAdapter<? extends Object> adapter : this.configService.getInboundAdapterList()) {
 				LOG.fine("Shutdown" + adapter.getName());
 				adapter.shutDown();
 			}
@@ -96,9 +97,13 @@ public class DefaultControllerImpl implements IAnjaroController {
 		LOG.entering(DefaultControllerImpl.class.getName(), "execute");
 		final String featureName = pCommand.getFeatureName();
 		CommandResult result = new CommandResult();
-		if (featureName == null || this.featureMap.get(featureName) == null) {
-			result = CommandResultHelper.createResult(DefaultAnjaroError.featureNotAvailable, new Object[] { featureName });
-			LOG.severe(result.getErrorMessage());
+		if ((featureName == null) || (this.featureMap.get(featureName) == null)) {
+			if ((featureName != null) && (this.configService.getOutboundAdapter() != null)) {
+				result = this.configService.getOutboundAdapter().sendCommand(pCommand);
+			} else {
+				result = CommandResultHelper.createResult(DefaultAnjaroError.featureNotAvailable, new Object[] { featureName });
+				LOG.severe(result.getErrorMessage());
+			}
 		} else {
 			final IFeature feature = this.featureMap.get(featureName);
 			final String methodString = pCommand.getMethod();

@@ -9,7 +9,8 @@ import de.anjaro.controller.impl.DefaultControllerImpl;
 import de.anjaro.dispatcher.impl.SimpleStringCommandDispatcher;
 import de.anjaro.feature.IFeature;
 import de.anjaro.feature.impl.RaspberryServoMotorFeature;
-import de.anjaro.remote.IAdapter;
+import de.anjaro.remote.IInboundAdapter;
+import de.anjaro.remote.IOutboundAdapter;
 import de.anjaro.remote.impl.SystemInInboundAdapter;
 
 public class SystemInServoRobot implements IConfigService {
@@ -23,8 +24,8 @@ public class SystemInServoRobot implements IConfigService {
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public List<IAdapter> getAdapterList() {
-		final List<IAdapter> resultList = new ArrayList<IAdapter>();
+	public List<IInboundAdapter> getInboundAdapterList() {
+		final List<IInboundAdapter> resultList = new ArrayList<IInboundAdapter>();
 		final SystemInInboundAdapter sysInAdapter = new SystemInInboundAdapter();
 		sysInAdapter.setCommandDispatcher(new SimpleStringCommandDispatcher());
 		resultList.add(sysInAdapter);
@@ -34,6 +35,11 @@ public class SystemInServoRobot implements IConfigService {
 	@Override
 	public IAnjaroController getController() {
 		return new DefaultControllerImpl();
+	}
+
+	@Override
+	public IOutboundAdapter<String> getOutboundAdapter() {
+		return null;
 	}
 
 

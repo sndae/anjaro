@@ -4,7 +4,8 @@ import java.util.List;
 
 import de.anjaro.controller.IAnjaroController;
 import de.anjaro.feature.IFeature;
-import de.anjaro.remote.IAdapter;
+import de.anjaro.remote.IInboundAdapter;
+import de.anjaro.remote.IOutboundAdapter;
 import de.anjaro.util.AnjaroConstants;
 
 
@@ -42,11 +43,14 @@ public interface IConfigService {
 	 * IO adapter, Socket adapter, etc.
 	 * Can be null.
 	 * 
-	 * @See IAdapter
+	 * @See IInboundAdapter
 	 *
 	 * @return the adapter list
 	 */
-	List<IAdapter> getAdapterList();
+	List<IInboundAdapter> getInboundAdapterList();
+
+
+	public IOutboundAdapter getOutboundAdapter();
 
 	/**
 	 * Gets the controller.

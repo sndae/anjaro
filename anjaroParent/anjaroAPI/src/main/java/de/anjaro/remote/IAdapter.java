@@ -8,7 +8,7 @@ import de.anjaro.dispatcher.ICommandDispatcher;
  *
  * @param <C> the generic type
  */
-public interface IAdapter<C> extends Runnable {
+public interface IAdapter<C> {
 
 	/**
 	 * Gets the name.

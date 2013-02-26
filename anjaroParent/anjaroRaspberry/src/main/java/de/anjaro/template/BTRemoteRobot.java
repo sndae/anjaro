@@ -10,7 +10,8 @@ import de.anjaro.dispatcher.impl.ObjectSerializeCommandDispatcher;
 import de.anjaro.feature.IFeature;
 import de.anjaro.feature.impl.RaspberryLedLightFeature;
 import de.anjaro.feature.impl.RaspberryServoMotorFeature;
-import de.anjaro.remote.IAdapter;
+import de.anjaro.remote.IInboundAdapter;
+import de.anjaro.remote.IOutboundAdapter;
 import de.anjaro.remote.impl.BluetoothInboundAdapter;
 
 public class BTRemoteRobot implements IConfigService {
@@ -27,12 +28,20 @@ public class BTRemoteRobot implements IConfigService {
 
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List<IAdapter> getAdapterList() {
-		final List<IAdapter> resultList = new ArrayList<IAdapter>();
+	public List<IInboundAdapter> getInboundAdapterList() {
+		final List<IInboundAdapter> resultList = new ArrayList<IInboundAdapter>();
 		final BluetoothInboundAdapter btAdapter = new BluetoothInboundAdapter();
 		btAdapter.setCommandDispatcher(new ObjectSerializeCommandDispatcher());
 		resultList.add(btAdapter);
 		return resultList;
+	}
+
+
+
+
+	@Override
+	public IOutboundAdapter<String> getOutboundAdapter() {
+		return null;
 	}
 
 

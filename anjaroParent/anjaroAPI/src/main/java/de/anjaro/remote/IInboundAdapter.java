@@ -5,6 +5,6 @@ package de.anjaro.remote;
  *
  * @param <C> the generic type
  */
-public interface IInboundAdapter<C> extends IAdapter<C> {
+public interface IInboundAdapter<C> extends IAdapter<C>, Runnable  {
 
 }
