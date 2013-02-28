@@ -42,6 +42,11 @@ public class SystemInServoRobot implements IConfigService {
 		return null;
 	}
 
+	@Override
+	public String getProperty(final String pKey) {
+		return null;
+	}
+
 
 
 }

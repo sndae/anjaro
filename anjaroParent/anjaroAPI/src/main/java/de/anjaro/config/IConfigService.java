@@ -63,4 +63,5 @@ public interface IConfigService {
 	 */
 	IAnjaroController getController();
 
+	String getProperty(String pKey);
 }

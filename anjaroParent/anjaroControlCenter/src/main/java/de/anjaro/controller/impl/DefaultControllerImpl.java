@@ -48,11 +48,11 @@ public class DefaultControllerImpl implements IAnjaroController {
 		}
 		LOG.fine("Init adapters");
 		final List<IInboundAdapter> adapterList = this.configService.getInboundAdapterList();
-		if ((adapterList != null) && (adapterList.size() > 0)) {
+		if (adapterList != null && adapterList.size() > 0) {
 			this.executorService = Executors.newFixedThreadPool(adapterList.size());
 			for (final IInboundAdapter<? extends Object> adapter : adapterList) {
 				LOG.fine("Initialize " + adapter.getName());
-				adapter.init(this);
+				adapter.init(pConfigService);
 				this.executorService.execute(adapter);
 			}
 		}
@@ -63,7 +63,7 @@ public class DefaultControllerImpl implements IAnjaroController {
 	public void shutdown() {
 		LOG.entering(DefaultControllerImpl.class.getName(), "shutdown");
 		LOG.fine("Shutdown adapters");
-		if ((this.configService.getInboundAdapterList() != null) && !this.configService.getInboundAdapterList().isEmpty()) {
+		if (this.configService.getInboundAdapterList() != null && !this.configService.getInboundAdapterList().isEmpty()) {
 			for (final IAdapter<? extends Object> adapter : this.configService.getInboundAdapterList()) {
 				LOG.fine("Shutdown" + adapter.getName());
 				adapter.shutDown();
@@ -97,8 +97,8 @@ public class DefaultControllerImpl implements IAnjaroController {
 		LOG.entering(DefaultControllerImpl.class.getName(), "execute");
 		final String featureName = pCommand.getFeatureName();
 		CommandResult result = new CommandResult();
-		if ((featureName == null) || (this.featureMap.get(featureName) == null)) {
-			if ((featureName != null) && (this.configService.getOutboundAdapter() != null)) {
+		if (featureName == null || this.featureMap.get(featureName) == null) {
+			if (featureName != null && this.configService.getOutboundAdapter() != null) {
 				result = this.configService.getOutboundAdapter().sendCommand(pCommand);
 			} else {
 				result = CommandResultHelper.createResult(DefaultAnjaroError.featureNotAvailable, new Object[] { featureName });
@@ -112,7 +112,7 @@ public class DefaultControllerImpl implements IAnjaroController {
 					LOG.finer("Method:" + methodString);
 				}
 				Method method = null;
-				if ((pCommand.getParams() != null) && (pCommand.getParams().length > 0)) {
+				if (pCommand.getParams() != null && pCommand.getParams().length > 0) {
 					final Class<?>[] clazzArray = new Class[pCommand.getParams().length];
 					for (int i = 0; i < pCommand.getParams().length; i++) {
 						if (LOG.isLoggable(Level.FINER)) {

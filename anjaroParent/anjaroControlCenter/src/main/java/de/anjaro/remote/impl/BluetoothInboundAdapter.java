@@ -15,6 +15,7 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 import javax.microedition.io.StreamConnectionNotifier;
 
+import de.anjaro.config.IConfigService;
 import de.anjaro.controller.IAnjaroController;
 import de.anjaro.dispatcher.ICommandDispatcher;
 import de.anjaro.model.Command;
@@ -35,9 +36,9 @@ public class BluetoothInboundAdapter implements IInboundAdapter<byte[]> {
 	}
 
 	@Override
-	public void init(final IAnjaroController pController) throws Exception {
+	public void init(final IConfigService pConfig) throws Exception {
 		LOG.entering(this.getClass().getName(), "init");
-		this.controller = pController;
+		this.controller = pConfig.getController();
 
 	}
 
@@ -77,17 +78,13 @@ public class BluetoothInboundAdapter implements IInboundAdapter<byte[]> {
 				while (true) {
 					LOG.info("Bluetooth inbound adapter waits for input");
 					boolean readNext = true;
-					final int commandEndCounter = 0;
 					final ByteArrayOutputStream bout = new ByteArrayOutputStream();
 					while(readNext) {
 						final int part = inputStream.read();
 						if (part != 167) {
 							bout.write(part);
 						} else {
-							//							commandEndCounter = commandEndCounter + 1;
-							//							if (commandEndCounter >= 3) {
 							readNext = false;
-							//							}
 						}
 					}
 					bout.flush();
@@ -103,7 +100,6 @@ public class BluetoothInboundAdapter implements IInboundAdapter<byte[]> {
 
 					final byte[] resultByte = this.commandDispatcher.getCommandResult(result);
 					responseStream.write(resultByte);
-					//responseStream.write("§".getBytes());
 					responseStream.flush();
 				}
 			} catch (final Exception e) {

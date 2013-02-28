@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.logging.Logger;
 
 import de.anjaro.dispatcher.ICommandDispatcher;
+import de.anjaro.exception.DispatcherException;
 import de.anjaro.model.Command;
 import de.anjaro.model.CommandResult;
 
@@ -11,6 +12,19 @@ public class SimpleStringCommandDispatcher implements ICommandDispatcher<String>
 
 	private static final Logger LOG = Logger.getLogger(SimpleStringCommandDispatcher.class.getName());
 
+
+
+	@Override
+	public String getCommand(final Command pCommand) throws DispatcherException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CommandResult getCommandResult(final String pCommandResult) throws DispatcherException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	@Override
 	public Command getCommand(final String pCommand) {

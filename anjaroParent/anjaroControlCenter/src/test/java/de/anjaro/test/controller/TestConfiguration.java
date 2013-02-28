@@ -34,6 +34,11 @@ public class TestConfiguration implements IConfigService {
 		return null;
 	}
 
+	@Override
+	public String getProperty(final String pKey) {
+		return null;
+	}
+
 
 
 }

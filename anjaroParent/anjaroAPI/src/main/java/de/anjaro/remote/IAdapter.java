@@ -1,6 +1,6 @@
 package de.anjaro.remote;
 
-import de.anjaro.controller.IAnjaroController;
+import de.anjaro.config.IConfigService;
 import de.anjaro.dispatcher.ICommandDispatcher;
 
 /**
@@ -17,13 +17,7 @@ public interface IAdapter<C> {
 	 */
 	String getName();
 
-	/**
-	 * Inits the.
-	 *
-	 * @param pController the controller
-	 * @throws Exception the exception
-	 */
-	void init(IAnjaroController pController) throws Exception;
+	void init(IConfigService pConfig) throws Exception;
 
 
 	/**

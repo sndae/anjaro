@@ -68,5 +68,12 @@ public interface ITwoMotorFeature extends IFeature {
 	 */
 	MotorStatus getLeftMotorStatus();
 
+	void forward(Speed pSpeed);
+
+	void backward(Speed pSpeed);
+
+	void left(Speed pSpeed);
+
+	void right(Speed pSpeed);
 
 }

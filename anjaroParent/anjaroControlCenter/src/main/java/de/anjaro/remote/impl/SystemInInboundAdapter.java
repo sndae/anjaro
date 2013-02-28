@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.logging.Logger;
 
+import de.anjaro.config.IConfigService;
 import de.anjaro.controller.IAnjaroController;
 import de.anjaro.dispatcher.ICommandDispatcher;
 import de.anjaro.exception.DispatcherException;
@@ -27,8 +28,8 @@ public class SystemInInboundAdapter implements IInboundAdapter<String> {
 	}
 
 	@Override
-	public void init(final IAnjaroController pController) throws Exception {
-		this.controller = pController;
+	public void init(final IConfigService pConfig) throws Exception {
+		this.controller = pConfig.getController();
 
 	}
 

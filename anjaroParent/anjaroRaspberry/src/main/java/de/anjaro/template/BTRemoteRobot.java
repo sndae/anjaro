@@ -53,6 +53,13 @@ public class BTRemoteRobot implements IConfigService {
 
 
 
+	@Override
+	public String getProperty(final String pKey) {
+		return null;
+	}
+
+
+
 
 
 

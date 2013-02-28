@@ -131,7 +131,7 @@ public class RaspberryServoMotorFeature implements ITwoMotorFeature {
 	 */
 	private void stopMotor(final RaspberryServoMotorActor pThread, final ExecutorService pExecutorService) {
 		LOG.entering(RaspberryServoMotorFeature.class.getName(), "stopMotor");
-		if ((pThread != null)) {
+		if (pThread != null) {
 			pThread.stop();
 			try {
 				pExecutorService.awaitTermination(30, TimeUnit.MILLISECONDS);
@@ -221,6 +221,38 @@ public class RaspberryServoMotorFeature implements ITwoMotorFeature {
 			LOG.severe("Unable to shut down GPIO pins.");
 			LOG.throwing(this.getClass().getName(), "onShutDown", e);
 		}
+	}
+
+
+
+	@Override
+	public void forward(final Speed pSpeed) {
+		this.runAllMotor(Direction.forward, pSpeed);
+	}
+
+
+
+	@Override
+	public void backward(final Speed pSpeed) {
+		this.runAllMotor(Direction.backward, pSpeed);
+
+	}
+
+
+
+	@Override
+	public void left(final Speed pSpeed) {
+		this.runRightMotor(Direction.forward, pSpeed);
+		this.runLeftMotor(Direction.backward, pSpeed);
+
+	}
+
+
+
+	@Override
+	public void right(final Speed pSpeed) {
+		this.runRightMotor(Direction.backward, pSpeed);
+		this.runLeftMotor(Direction.forward, pSpeed);
 	}
 
 

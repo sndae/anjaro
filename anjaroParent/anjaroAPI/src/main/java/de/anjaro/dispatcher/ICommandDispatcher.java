@@ -26,6 +26,8 @@ public interface ICommandDispatcher<C> {
 	 */
 	Command getCommand(C pCommand) throws DispatcherException;
 
+	C getCommand(Command pCommand) throws DispatcherException;
+
 	/**
 	 * Gets the command result.
 	 *
@@ -34,5 +36,7 @@ public interface ICommandDispatcher<C> {
 	 * @throws DispatcherException if the CommandResult object cannot be converted to the appropriate format
 	 */
 	C getCommandResult(CommandResult pCommandResult) throws DispatcherException;
+
+	CommandResult getCommandResult(C pCommandResult) throws DispatcherException;
 
 }
