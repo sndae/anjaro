@@ -39,7 +39,7 @@ public class ControllerTest implements IShutdownListener {
 		try {
 			controller.init(config);
 			Mockito.verify(this.feature).init(controller);
-			Mockito.verify(this.adapter).init(controller);
+			Mockito.verify(this.adapter).init(config);
 			final CommandResult result = controller.execute(command);
 			Assert.assertEquals("okidoki", result.getSuccessResult());
 			Assert.assertEquals(DefaultAnjaroError.success.getErrorCode(), result.getErrorCode());
