@@ -36,6 +36,8 @@ public class ObjectSerializeCommandDispatcher implements ICommandDispatcher<byte
 			final ObjectOutputStream oout = new ObjectOutputStream(bout);
 			oout.writeObject(pObject);
 			LOG.exiting(ObjectSerializeCommandDispatcher.class.getName(), "getCommandResult");
+			bout.flush();
+			bout.close();
 			return bout.toByteArray();
 		} catch (final Exception e) {
 			LOG.throwing(this.getClass().getName(), "getCommandResult", e);
@@ -46,7 +48,7 @@ public class ObjectSerializeCommandDispatcher implements ICommandDispatcher<byte
 	private Serializable deserialize(final byte[] pObject) throws DispatcherException {
 		try {
 			final ObjectInputStream oin = new ObjectInputStream(new ByteArrayInputStream(pObject));
-			final Command result = (Command) oin.readObject();
+			final Serializable result = (Serializable) oin.readObject();
 			LOG.exiting(ObjectSerializeCommandDispatcher.class.getName(), "getCommand");
 			return result;
 		} catch (final Exception e) {

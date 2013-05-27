@@ -19,6 +19,7 @@ import de.anjaro.model.Command;
 import de.anjaro.model.CommandResult;
 import de.anjaro.remote.IAdapter;
 import de.anjaro.remote.IInboundAdapter;
+import de.anjaro.remote.IOutboundAdapter;
 import de.anjaro.util.CommandResultHelper;
 import de.anjaro.util.DefaultAnjaroError;
 import de.anjaro.util.IShutdownListener;
@@ -33,6 +34,8 @@ public class DefaultControllerImpl implements IAnjaroController {
 
 	private ExecutorService executorService;
 
+	private IOutboundAdapter outboundAdapter;
+
 	private final List<IShutdownListener> shutDownListenerList = new ArrayList<IShutdownListener>();
 
 	@Override
@@ -46,15 +49,20 @@ public class DefaultControllerImpl implements IAnjaroController {
 			feature.init(this);
 			this.featureMap.put(feature.getName(), feature);
 		}
-		LOG.fine("Init adapters");
+		LOG.fine("Init inbound adapters");
 		final List<IInboundAdapter> adapterList = this.configService.getInboundAdapterList();
-		if (adapterList != null && adapterList.size() > 0) {
+		if ((adapterList != null) && (adapterList.size() > 0)) {
 			this.executorService = Executors.newFixedThreadPool(adapterList.size());
 			for (final IInboundAdapter<? extends Object> adapter : adapterList) {
 				LOG.fine("Initialize " + adapter.getName());
 				adapter.init(pConfigService);
 				this.executorService.execute(adapter);
 			}
+		}
+		LOG.fine("Init outbound adapters");
+		if (this.configService.getOutboundAdapter() != null) {
+			this.outboundAdapter = this.configService.getOutboundAdapter();
+			this.outboundAdapter.init(this.configService);
 		}
 		LOG.exiting(DefaultControllerImpl.class.getName(), "init");
 	}
@@ -63,7 +71,7 @@ public class DefaultControllerImpl implements IAnjaroController {
 	public void shutdown() {
 		LOG.entering(DefaultControllerImpl.class.getName(), "shutdown");
 		LOG.fine("Shutdown adapters");
-		if (this.configService.getInboundAdapterList() != null && !this.configService.getInboundAdapterList().isEmpty()) {
+		if ((this.configService.getInboundAdapterList() != null) && !this.configService.getInboundAdapterList().isEmpty()) {
 			for (final IAdapter<? extends Object> adapter : this.configService.getInboundAdapterList()) {
 				LOG.fine("Shutdown" + adapter.getName());
 				adapter.shutDown();
@@ -97,9 +105,9 @@ public class DefaultControllerImpl implements IAnjaroController {
 		LOG.entering(DefaultControllerImpl.class.getName(), "execute");
 		final String featureName = pCommand.getFeatureName();
 		CommandResult result = new CommandResult();
-		if (featureName == null || this.featureMap.get(featureName) == null) {
-			if (featureName != null && this.configService.getOutboundAdapter() != null) {
-				result = this.configService.getOutboundAdapter().sendCommand(pCommand);
+		if ((featureName == null) || (this.featureMap.get(featureName) == null)) {
+			if ((featureName != null) && (this.outboundAdapter != null)) {
+				result = this.outboundAdapter.sendCommand(pCommand);
 			} else {
 				result = CommandResultHelper.createResult(DefaultAnjaroError.featureNotAvailable, new Object[] { featureName });
 				LOG.severe(result.getErrorMessage());
@@ -112,7 +120,7 @@ public class DefaultControllerImpl implements IAnjaroController {
 					LOG.finer("Method:" + methodString);
 				}
 				Method method = null;
-				if (pCommand.getParams() != null && pCommand.getParams().length > 0) {
+				if ((pCommand.getParams() != null) && (pCommand.getParams().length > 0)) {
 					final Class<?>[] clazzArray = new Class[pCommand.getParams().length];
 					for (int i = 0; i < pCommand.getParams().length; i++) {
 						if (LOG.isLoggable(Level.FINER)) {
