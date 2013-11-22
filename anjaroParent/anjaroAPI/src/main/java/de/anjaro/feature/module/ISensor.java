@@ -1,5 +1,7 @@
 package de.anjaro.feature.module;
 
+import java.util.Properties;
+
 /**
  * The Interface ISensor. A sensor is everything, which receives information from the outside world,
  * which could change the behaviour of the robot.
@@ -8,5 +10,10 @@ package de.anjaro.feature.module;
  * @author Joachim Pasquali
  */
 public interface ISensor extends IModule {
+
+	String getId();
+
+
+	void adjust(Properties pValues);
 
 }

@@ -20,4 +20,6 @@ public interface IModule extends Runnable {
 	 */
 	void init(IAnjaroController pController) throws Exception;
 
+	void shuthdown();
+
 }

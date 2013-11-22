@@ -1,9 +1,11 @@
 package de.anjaro.config;
 
 import java.util.List;
+import java.util.Map;
 
 import de.anjaro.controller.IAnjaroController;
 import de.anjaro.feature.IFeature;
+import de.anjaro.feature.module.ISensor;
 import de.anjaro.remote.IInboundAdapter;
 import de.anjaro.remote.IOutboundAdapter;
 import de.anjaro.util.AnjaroConstants;
@@ -50,7 +52,24 @@ public interface IConfigService {
 	List<IInboundAdapter> getInboundAdapterList();
 
 
-	public IOutboundAdapter getOutboundAdapter();
+	/**
+	 * A robot can forward commands, to the outbound adapter, if the 
+	 * requested feature is not registered in the controller
+	 * 
+	 * @return
+	 */
+	IOutboundAdapter getOutboundAdapter();
+
+	/**
+	 * Returns the list of all sensors of the robot.
+	 * Each sensor should have a unique id. The controller
+	 * will not check this. It will just overwrite sensors with the same sensor id.
+	 * So, take care of this in your configuration.
+	 * 
+	 * @return map of senor id sensore pairs
+	 */
+	Map<String, ISensor> getSensorMap();
+
 
 	/**
 	 * Gets the controller.

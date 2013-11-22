@@ -76,4 +76,8 @@ public interface ITwoMotorFeature extends IFeature {
 
 	void right(Speed pSpeed);
 
+	void runRightMotor(String pSpeedValue);
+
+	void runLeftMotor(String pSpeedValue);
+
 }

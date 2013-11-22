@@ -23,6 +23,17 @@ public class Command implements Serializable {
 	/** The params. */
 	private Serializable[] params;
 
+
+	public Command() {
+		super();
+	}
+
+	public Command(final String pFeatureName, final String pMethod) {
+		super();
+		this.featureName = pFeatureName;
+		this.method = pMethod;
+	}
+
 	/**
 	 * Gets the method.
 	 *

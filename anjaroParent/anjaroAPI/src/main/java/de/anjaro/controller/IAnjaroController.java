@@ -1,5 +1,9 @@
 package de.anjaro.controller;
+import java.util.Properties;
+
 import de.anjaro.config.IConfigService;
+import de.anjaro.event.IEvent;
+import de.anjaro.event.IEventListener;
 import de.anjaro.model.Command;
 import de.anjaro.model.CommandResult;
 import de.anjaro.util.IShutdownListener;
@@ -50,5 +54,28 @@ public interface IAnjaroController {
 	 */
 	void addShutdownListener(IShutdownListener pShutdownListener);
 
+	/**
+	 * Sensors can use this method to fire events
+	 * 
+	 * @param pEvent The event to be fired and delegated by the controller
+	 */
+	void fireEvent(IEvent<?> pEvent);
+
+	/**
+	 * A registered eventlistener will be called in case an event is fired.
+	 * 
+	 * @param pEvent
+	 * @param pListener
+	 */
+	void registerEventListener(String pEvent, IEventListener pListener);
+
+
+	/**
+	 * Sensor can be adjusted during runtime by sending them new values.
+	 * 
+	 * @param pSensorId
+	 * @param pValues
+	 */
+	void adjustSensor(String pSensorId, Properties pValues);
 
 }
