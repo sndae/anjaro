@@ -65,7 +65,7 @@ public class SocketOutboundAdapter implements IOutboundAdapter<byte[]> {
 			socket.getOutputStream().flush();
 			final ByteArrayOutputStream bout = new ByteArrayOutputStream();
 			int b;
-			while((b =  socket.getInputStream().read()) != 167 ) {
+			while((b =  socket.getInputStream().read()) != 126 ) {
 				bout.write(b);
 			}
 			socket.getInputStream().close();

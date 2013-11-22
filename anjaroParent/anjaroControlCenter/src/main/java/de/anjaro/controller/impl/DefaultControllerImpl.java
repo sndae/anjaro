@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -14,7 +15,10 @@ import java.util.logging.Logger;
 
 import de.anjaro.config.IConfigService;
 import de.anjaro.controller.IAnjaroController;
+import de.anjaro.event.IEvent;
+import de.anjaro.event.IEventListener;
 import de.anjaro.feature.IFeature;
+import de.anjaro.feature.module.ISensor;
 import de.anjaro.model.Command;
 import de.anjaro.model.CommandResult;
 import de.anjaro.remote.IAdapter;
@@ -32,17 +36,26 @@ public class DefaultControllerImpl implements IAnjaroController {
 
 	private Map<String, IFeature> featureMap;
 
-	private ExecutorService executorService;
+	private ExecutorService inboundAdapterExecutorService;
+
+	private ExecutorService sensorExecutorService;
 
 	private IOutboundAdapter outboundAdapter;
 
+	private final Map<String, List<IEventListener>> eventMap = new HashMap<String, List<IEventListener>>();
+
 	private final List<IShutdownListener> shutDownListenerList = new ArrayList<IShutdownListener>();
+
+	private Map<String, ISensor> sensorMap = new HashMap<String, ISensor>();
 
 	@Override
 	public void init(final IConfigService pConfigService) throws Exception {
 		LOG.entering(DefaultControllerImpl.class.getName(), "init");
-		LOG.fine("Init features");
 		this.configService = pConfigService;
+		this.sensorMap = this.configService.getSensorMap() == null ? new HashMap<String, ISensor>() : this.configService.getSensorMap();
+
+
+		LOG.fine("Init features");
 		this.featureMap = new HashMap<String, IFeature>();
 		for (final IFeature feature : this.configService.getFeatureList()) {
 			LOG.fine("Initialize " + feature.getName());
@@ -52,11 +65,11 @@ public class DefaultControllerImpl implements IAnjaroController {
 		LOG.fine("Init inbound adapters");
 		final List<IInboundAdapter> adapterList = this.configService.getInboundAdapterList();
 		if ((adapterList != null) && (adapterList.size() > 0)) {
-			this.executorService = Executors.newFixedThreadPool(adapterList.size());
+			this.inboundAdapterExecutorService = Executors.newFixedThreadPool(adapterList.size());
 			for (final IInboundAdapter<? extends Object> adapter : adapterList) {
 				LOG.fine("Initialize " + adapter.getName());
 				adapter.init(pConfigService);
-				this.executorService.execute(adapter);
+				this.inboundAdapterExecutorService.execute(adapter);
 			}
 		}
 		LOG.fine("Init outbound adapters");
@@ -64,6 +77,18 @@ public class DefaultControllerImpl implements IAnjaroController {
 			this.outboundAdapter = this.configService.getOutboundAdapter();
 			this.outboundAdapter.init(this.configService);
 		}
+
+		LOG.fine("Init Sensors");
+		if (this.sensorMap.size() > 0) {
+			this.sensorExecutorService = Executors.newFixedThreadPool(this.sensorMap.size());
+			for (final String sensorId : this.sensorMap.keySet()) {
+				LOG.fine("Init sensor: " + sensorId);
+				final ISensor sensor = this.sensorMap.get(sensorId);
+				sensor.init(this);
+				this.sensorExecutorService.execute(sensor);
+			}
+		}
+
 		LOG.exiting(DefaultControllerImpl.class.getName(), "init");
 	}
 
@@ -76,9 +101,9 @@ public class DefaultControllerImpl implements IAnjaroController {
 				LOG.fine("Shutdown" + adapter.getName());
 				adapter.shutDown();
 			}
-			this.executorService.shutdown();
+			this.inboundAdapterExecutorService.shutdown();
 			try {
-				this.executorService.awaitTermination(2000, TimeUnit.MILLISECONDS);
+				this.inboundAdapterExecutorService.awaitTermination(2000, TimeUnit.MILLISECONDS);
 			} catch (final InterruptedException e) {
 				LOG.throwing(this.getClass().getName(), "shutdown", e);
 			}
@@ -87,6 +112,11 @@ public class DefaultControllerImpl implements IAnjaroController {
 		for (final IFeature feature : this.configService.getFeatureList()) {
 			LOG.fine("Shutdown " + feature.getName());
 			feature.shutDown();
+		}
+
+		LOG.fine("Shutdown sensors");
+		for (final String sensor : this.configService.getSensorMap().keySet()) {
+			this.configService.getSensorMap().get(sensor).shuthdown();
 		}
 		for (final IShutdownListener sdl : this.shutDownListenerList) {
 			sdl.shutDown();
@@ -144,4 +174,50 @@ public class DefaultControllerImpl implements IAnjaroController {
 		LOG.exiting(DefaultControllerImpl.class.getName(), "execute");
 		return result;
 	}
+
+	@Override
+	public void fireEvent(final IEvent<?> pEvent) {
+		LOG.entering(DefaultControllerImpl.class.getName(), "fireEvent");
+		if (LOG.isLoggable(Level.FINER)) {
+			LOG.finer("Event was fired: " +  pEvent.getName() + " from Sensor: " + pEvent.getSensorId() + " and value: " + pEvent.getValue());
+		}
+		final List<IEventListener> eventListenerList = this.eventMap.get(pEvent.getName());
+		if (eventListenerList != null) {
+			for (final IEventListener el : eventListenerList) {
+				el.onEvent(pEvent);
+			}
+		} else {
+			LOG.warning("No eventlistener found for event" + pEvent.toString());
+		}
+		LOG.exiting(DefaultControllerImpl.class.getName(), "fireEvent");
+
+	}
+
+	@Override
+	public void registerEventListener(final String pEventName, final IEventListener pListener) {
+		LOG.entering(DefaultControllerImpl.class.getName(), "registerEventListener");
+		List<IEventListener> listenerList = this.eventMap.get(pEventName);
+		if (this.eventMap.get(pEventName) == null) {
+			listenerList = new ArrayList<IEventListener>();
+			this.eventMap.put(pEventName, listenerList);
+		}
+		listenerList.add(pListener);
+		LOG.exiting(DefaultControllerImpl.class.getName(), "registerEventListener");
+	}
+
+
+
+	@Override
+	public void adjustSensor(final String pSensorId, final Properties pValues) {
+		LOG.entering(DefaultControllerImpl.class.getName(), "adjustSensor");
+		final ISensor sensor = this.sensorMap.get(pSensorId);
+		if (sensor != null) {
+			sensor.adjust(pValues);
+		} else {
+			LOG.warning("Unable to find Sensor with id: " + pSensorId);
+		}
+		LOG.exiting(DefaultControllerImpl.class.getName(), "adjustSensor");
+	}
+
+
 }

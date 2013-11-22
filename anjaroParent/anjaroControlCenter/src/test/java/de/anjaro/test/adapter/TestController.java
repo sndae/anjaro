@@ -1,7 +1,11 @@
 package de.anjaro.test.adapter;
 
+import java.util.Properties;
+
 import de.anjaro.config.IConfigService;
 import de.anjaro.controller.IAnjaroController;
+import de.anjaro.event.IEvent;
+import de.anjaro.event.IEventListener;
 import de.anjaro.model.Command;
 import de.anjaro.model.CommandResult;
 import de.anjaro.util.IShutdownListener;
@@ -39,5 +43,26 @@ public class TestController implements IAnjaroController {
 		// TODO Auto-generated method stub
 
 	}
+
+	@Override
+	public void fireEvent(final IEvent pEvent) {
+		// TODO Auto-generated method stub
+
+	}
+
+
+
+	@Override
+	public void registerEventListener(final String pEvent, final IEventListener pListener) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void adjustSensor(final String pSensorId, final Properties pValues) {
+		// TODO Auto-generated method stub
+
+	}
+
 
 }

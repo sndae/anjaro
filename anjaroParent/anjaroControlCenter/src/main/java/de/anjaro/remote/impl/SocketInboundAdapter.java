@@ -1,6 +1,5 @@
 package de.anjaro.remote.impl;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -69,20 +68,20 @@ public class SocketInboundAdapter implements IInboundAdapter<byte[]> {
 			this.serverSocket = new ServerSocket(this.listenerPort);
 			LOG.fine("Socket successfully created on port: " + this.listenerPort);
 			this.clientSocket = this.serverSocket.accept();
-
+			LOG.fine("Got connection on accepted server socket. Start reading now");
+			out = this.clientSocket.getOutputStream();
+			in = this.clientSocket.getInputStream();
 			while (true) {
-				LOG.fine("Got connection on accepted server socket. Start reading now");
-				out = this.clientSocket.getOutputStream();
-				in = this.clientSocket.getInputStream();
-				//			final boolean readNext = true;
-				final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-				int b;
-				while ((b = in.read()) != 167) {
-					bout.write(b);
+				final byte[] buf=new byte[4096];
+				int bytes_read = 0;
+				bytes_read = in.read(buf, 0, buf.length);
+				if(bytes_read < 0) {
+					LOG.info("Exit command from client received or line is null. Will close sockets now");
+					break;
 				}
-				bout.flush();
-				bout.close();
-				final Command command = this.commandDispatcher.getCommand(bout.toByteArray());
+				final String stringCommand = new String(buf, 0, bytes_read);
+				LOG.info("Received " + bytes_read + " bytes, data=" + (stringCommand));
+				final Command command = this.commandDispatcher.getCommand(stringCommand.getBytes());
 				if (LOG.isLoggable(Level.INFO)) {
 					LOG.info("Received command over socket: " + command);
 				}
@@ -92,12 +91,11 @@ public class SocketInboundAdapter implements IInboundAdapter<byte[]> {
 				}
 				final byte[] resultByte = this.commandDispatcher.getCommandResult(result);
 				out.write(resultByte);
-				out.write(167);
 				out.flush();
 			}
 
 		} catch (final Exception e) {
-			LOG.info("Exit command from client received or line is null. Will close sockets now");
+			LOG.throwing(SocketInboundAdapter.class.getName(), "Essssxit command from client received or line is null. Will close sockets now", e);
 		} finally {
 			try {
 				this.clientSocket.close();

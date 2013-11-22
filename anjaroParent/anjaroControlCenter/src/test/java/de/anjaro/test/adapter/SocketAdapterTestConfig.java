@@ -1,11 +1,13 @@
 package de.anjaro.test.adapter;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import de.anjaro.config.IConfigService;
 import de.anjaro.controller.IAnjaroController;
 import de.anjaro.feature.IFeature;
+import de.anjaro.feature.module.ISensor;
 import de.anjaro.remote.IInboundAdapter;
 import de.anjaro.remote.IOutboundAdapter;
 import de.anjaro.remote.impl.SocketInboundAdapter;
@@ -46,5 +48,13 @@ public class SocketAdapterTestConfig implements IConfigService {
 	public String getProperty(final String pKey) {
 		return this.props.getProperty(pKey);
 	}
+
+	@Override
+	public Map<String, ISensor> getSensorMap() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 
 }

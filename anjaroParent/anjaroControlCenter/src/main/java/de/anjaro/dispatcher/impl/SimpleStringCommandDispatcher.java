@@ -8,26 +8,26 @@ import de.anjaro.exception.DispatcherException;
 import de.anjaro.model.Command;
 import de.anjaro.model.CommandResult;
 
-public class SimpleStringCommandDispatcher implements ICommandDispatcher<String> {
+public class SimpleStringCommandDispatcher implements ICommandDispatcher<byte[]> {
 
 	private static final Logger LOG = Logger.getLogger(SimpleStringCommandDispatcher.class.getName());
 
 
 
 	@Override
-	public String getCommand(final Command pCommand) throws DispatcherException {
+	public byte[] getCommand(final Command pCommand) throws DispatcherException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CommandResult getCommandResult(final String pCommandResult) throws DispatcherException {
+	public CommandResult getCommandResult(final byte[] pCommandResult) throws DispatcherException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Command getCommand(final String pCommand) {
+	public Command getCommand(final byte[] pCommand) {
 		LOG.entering(SimpleStringCommandDispatcher.class.getName(), "getCommand");
 		final String commandString = new String(pCommand);
 		final String[] commandSplit = commandString.split(";");
@@ -48,16 +48,27 @@ public class SimpleStringCommandDispatcher implements ICommandDispatcher<String>
 	}
 
 	@Override
-	public String getCommandResult(final CommandResult pCommandResult) {
-		return pCommandResult.toString();
+	public byte[] getCommandResult(final CommandResult pCommandResult) {
+		return pCommandResult.toString().getBytes();
 	}
 
 	private Serializable getParam(final String pParam) {
+		Serializable result = pParam;
 		if (pParam.startsWith("$ENUM$")) {
-			return this.handleEnum(pParam);
+			result = this.handleEnum(pParam);
 		} else {
-			return pParam;
+			try {
+				result = Integer.valueOf(pParam);
+			} catch (final NumberFormatException e) {
+				// probably no int value
+				try {
+					result = Double.valueOf(pParam);
+				} catch (final NumberFormatException e1) {
+					// probably no double value
+				}
+			}
 		}
+		return result;
 	}
 
 	private Serializable handleEnum(final String pStringParam) {
