@@ -170,4 +170,11 @@ public class RaspberryServoMotorActor implements IActor {
 		this.running = false;
 	}
 
+	@Override
+	public void shuthdown() {
+		// TODO Auto-generated method stub
+
+	}
+
+
 }

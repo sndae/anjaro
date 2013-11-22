@@ -257,6 +257,43 @@ public class RaspberryServoMotorFeature implements ITwoMotorFeature {
 
 
 
+	@Override
+	public void runRightMotor(final String pSpeedValue) {
+		this.handleStringSpeed(pSpeedValue, true);
+	}
+
+
+
+	@Override
+	public void runLeftMotor(final String pSpeedValue) {
+		this.handleStringSpeed(pSpeedValue, false);
+	}
+
+	private void handleStringSpeed(final String pSpeedValue, final boolean pIsRight) {
+		int speedValue = 0;
+		Direction direction = Direction.forward;
+		try {
+			speedValue = Integer.parseInt(pSpeedValue);
+			if (speedValue < -10 || speedValue > 10) {
+				LOG.warning("Speed not in allowed range");
+				return;
+			}
+			if (speedValue < 0) {
+				speedValue = speedValue * -1;
+				direction = Direction.backward;
+			}
+			if (pIsRight) {
+				this.runRightMotor(direction, Speed.valueOf("speed" + speedValue));
+			} else {
+				this.runLeftMotor(direction, Speed.valueOf("speed" + speedValue));
+			}
+		} catch (final NumberFormatException e) {
+			LOG.warning("Cannot parse speed value");
+		}
+
+	}
+
+
 
 
 }

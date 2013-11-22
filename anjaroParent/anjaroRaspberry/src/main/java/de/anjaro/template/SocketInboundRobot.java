@@ -3,16 +3,18 @@ package de.anjaro.template;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import de.anjaro.config.IConfigService;
 import de.anjaro.controller.IAnjaroController;
 import de.anjaro.controller.impl.DefaultControllerImpl;
-import de.anjaro.dispatcher.impl.ObjectSerializeCommandDispatcher;
+import de.anjaro.dispatcher.impl.SimpleStringCommandDispatcher;
 import de.anjaro.feature.IFeature;
 import de.anjaro.feature.impl.RaspberryLedLightFeature;
 import de.anjaro.feature.impl.RaspberryServoMotorFeature;
+import de.anjaro.feature.module.ISensor;
 import de.anjaro.remote.IInboundAdapter;
 import de.anjaro.remote.IOutboundAdapter;
 import de.anjaro.remote.impl.SocketInboundAdapter;
@@ -35,7 +37,7 @@ public class SocketInboundRobot implements IConfigService {
 	public List<IInboundAdapter> getInboundAdapterList() {
 		final List<IInboundAdapter> resultList = new ArrayList<IInboundAdapter>();
 		final SocketInboundAdapter socketAdapter = new SocketInboundAdapter();
-		socketAdapter.setCommandDispatcher(new ObjectSerializeCommandDispatcher());
+		socketAdapter.setCommandDispatcher(new SimpleStringCommandDispatcher());
 		resultList.add(socketAdapter);
 		return resultList;
 	}
@@ -63,6 +65,12 @@ public class SocketInboundRobot implements IConfigService {
 			}
 		}
 		return this.props.getProperty(pKey);
+	}
+
+	@Override
+	public Map<String, ISensor> getSensorMap() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
