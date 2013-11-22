@@ -1,0 +1,25 @@
+#!/bin/sh
+
+export ANJARO_HOME=/opt/anjaro
+#de.anjaro.template.SocketInboundRobot
+launch_daemon()
+{
+  /bin/sh << EOF
+java -cp $ANJARO_HOME/conf:$ANJARO_HOME/lib/anjaroAPI-0.0.1-SNAPSHOT.jar:$ANJARO_HOME/lib/anjaroRaspberry-0.0.1-SNAPSHOT.jar:$ANJARO_HOME/lib/anjaroControlCenter-0.0.1-SNAPSHOT.jar:$ANJARO_HOME/lib/bluecove-2.1.0-.jar:$ANJARO_HOME/lib/bluecove-gpl-2.1.0.jar -Djava.library.path=$ANJARO_HOME/lib -Djava.util.logging.config.file=$ANJARO_HOME/conf/logging.properties -Danjaro.config.class=de.anjaro.template.SocketInboundRobot -agentlib:jdwp=transport=dt_socket,address=8999,server=y,suspend=n de.anjaro.bootstrap.AnjaroStarter <&- & 
+     pid=\$!
+     echo \${pid}
+EOF
+}
+
+daemon_pid=`launch_daemon`
+mypid=${daemon_pid%%Listening for transport dt_socket at address: 8000}
+echo $mypid
+if ps -p $mypid >/dev/null 2>&1
+then
+  # daemon is running.
+  echo "Daemon is started..."
+  echo $mypid > anjaro.pid
+else
+  echo "Daemon did not start."
+fi
+
